@@ -6,13 +6,14 @@ const int sda = 10;
 const int LEDred = 2;
 const int LEDgreen = 4;
 const int LEDyellow = 6;
+const int buzzpin = 7;
 #include <SPI.h>
 #include <MFRC522.h>
 
 MFRC522 mfrc522(sda, rst); // Create MFRC522 instance
 
 // the authorizedUID is basically just what your card is... I set it to the UID of my blue tag.
-byte authorizedUID[4] = {0x53, 0x7F, 0x40, 0xFA};
+byte authorizedUID[4] = {0x68, 0x81, 0x5F, 0x35};
 
 void setup() {
   // Initialize serial comms
@@ -22,6 +23,7 @@ void setup() {
   pinMode(LEDred, OUTPUT);
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDyellow, OUTPUT);
+  pinMode(buzzpin, OUTPUT);
   
   // Initialize SPI
   SPI.begin();
@@ -35,6 +37,7 @@ void setup() {
   digitalWrite(LEDred, LOW);
   digitalWrite(LEDgreen, LOW);
   digitalWrite(LEDyellow, LOW);
+  digitalWrite(buzzpin, LOW);
 }
 
 void loop() {
@@ -61,7 +64,9 @@ void loop() {
     digitalWrite(LEDred, HIGH);
     digitalWrite(LEDgreen, HIGH);
     digitalWrite(LEDyellow, HIGH);
-    
+    digitalWrite(buzzpin, HIGH);
+    delay(200);
+    digitalWrite(buzzpin,LOW);
     // Wait for 500
     delay(500);
     
@@ -71,6 +76,7 @@ void loop() {
     digitalWrite(LEDyellow, LOW);
   } else {
     Serial.println(F("Unknown card")); //if it doesnt match authUID
+
   }
 
   mfrc522.PICC_HaltA(); // Halt PICC..
