@@ -64,8 +64,6 @@ void loop() {
     digitalWrite(LEDred, HIGH);
     digitalWrite(LEDgreen, HIGH);
     digitalWrite(LEDyellow, HIGH);
-    digitalWrite(buzzpin, HIGH);
-    delay(200);
     digitalWrite(buzzpin,LOW);
     // Wait for 500
     delay(500);
@@ -76,7 +74,9 @@ void loop() {
     digitalWrite(LEDyellow, LOW);
   } else {
     Serial.println(F("Unknown card")); //if it doesnt match authUID
-
+    digitalWrite(buzzpin, HIGH);
+    delay(300);
+    digitalWrite(buzzpin, LOW);
   }
 
   mfrc522.PICC_HaltA(); // Halt PICC..
