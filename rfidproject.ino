@@ -9,7 +9,9 @@ const int LEDyellow = 6; //Yellow LED
 const int buzzpin = 7; //buzzer 
 const int RX_Pin = A0; //bluetooth
 const int TX_Pin = A1; //bluetooth
-char toothchar = 2;//bluetooth module character memory
+const int MAX_STRING_LENGTH = 10; // Maximum length for received string
+char toothString[MAX_STRING_LENGTH + 1]; // +1 for null terminator
+int stringIndex = 0; // Index to track position in the string
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Servo.h>
@@ -26,7 +28,10 @@ byte authorizedUID[4] = {0x68, 0x81, 0x5F, 0x35};
 void setup() {
   // Initialize serial comms
   Serial.begin(9600);
-  Serial.begin(115200);
+  tooth.begin(9600); // Initialize Bluetooth serial
+  
+  // Clear the string buffer
+  clearToothString();
 
   //set servo pin
   myServo.attach(8);
@@ -55,19 +60,32 @@ void setup() {
 void loop() {
   angle = 0;
 
-  if (tooth.available() >0){
-    toothchar = tooth.read();
-    tooth.print("reading new input");
-    tooth.println(toothchar);
-
+  // Check for Bluetooth data
+  if (tooth.available() > 0) {
+    char inChar = tooth.read();
+    
+    // If newline or carriage return, process the complete string
+    if (inChar == '\n' || inChar == '\r') {
+      toothString[stringIndex] = '\0'; // Null terminate the string
+      tooth.print("Received: ");
+      tooth.println(toothString);
+      
+      // Check if the string is "yes"
+      if (strcmp(toothString, "yes") == 0) {
+        digitalWrite(buzzpin, HIGH); // Turn on buzzer
+        delay(500); // Buzzer on for 500ms
+        digitalWrite(buzzpin, LOW); // Turn off buzzer
+      }
+      
+      // Reset for next string
+      clearToothString();
+    } 
+    // Otherwise add character to the string if there's room
+    else if (stringIndex < MAX_STRING_LENGTH) {
+      toothString[stringIndex] = inChar;
+      stringIndex++;
+    }
   }
-
-  if (toothchar == 'y'){
-    digitalWrite(buzzpin, LOW);
-    myServo.write(angle);
-  }
-
-  toothchar = angle;
   
 
   // Look for new cards
@@ -130,4 +148,10 @@ bool compareUID(byte *buffer1, byte *buffer2, byte bufferSize) {
     }
   }
   return true;
+}
+
+// Function to clear the received string
+void clearToothString() {
+  memset(toothString, 0, MAX_STRING_LENGTH + 1);
+  stringIndex = 0;
 }
