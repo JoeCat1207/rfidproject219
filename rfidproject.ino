@@ -7,8 +7,8 @@ const int LEDred = 2; //Red LED
 const int LEDgreen = 4; //Green LED
 const int LEDyellow = 6; //Yellow LED
 const int buzzpin = 7; //buzzer 
-const int RX_Pin = A0; //bluetooth
-const int TX_Pin = A1; //bluetooth
+const int RX_Pin = 8; //bluetooth
+const int TX_Pin = 3; //bluetooth
 const int MAX_STRING_LENGTH = 10; // Maximum length for received string
 char toothString[MAX_STRING_LENGTH + 1]; // +1 for null terminator
 int stringIndex = 0; // Index to track position in the string
@@ -27,7 +27,7 @@ byte authorizedUID[4] = {0x68, 0x81, 0x5F, 0x35};
 
 void setup() {
   // Initialize serial comms
-  Serial.begin(9600);
+  Serial.begin(115200); //seperates actual serial from bluetooth serial
   tooth.begin(9600); // Initialize Bluetooth serial
   
   // Clear the string buffer
