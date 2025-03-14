@@ -72,9 +72,23 @@ void loop() {
       
       // Check if the string is "yes"
       if (strcmp(toothString, "yes") == 0) {
-        digitalWrite(buzzpin, HIGH); // Turn on buzzer
-        delay(500); // Buzzer on for 500ms
-        digitalWrite(buzzpin, LOW); // Turn off buzzer
+        // Turn on all LEDs
+        digitalWrite(LEDred, HIGH);
+        digitalWrite(LEDgreen, HIGH);
+        digitalWrite(LEDyellow, HIGH);
+        
+        // Turn on buzzer for 300ms
+        digitalWrite(buzzpin, HIGH);
+        delay(300);
+        digitalWrite(buzzpin, LOW);
+        
+        // Keep LEDs on for remainder of 2 seconds
+        delay(1700);
+        
+        // Turn off all LEDs
+        digitalWrite(LEDred, LOW);
+        digitalWrite(LEDgreen, LOW);
+        digitalWrite(LEDyellow, LOW);
       }
       
       // Reset for next string
