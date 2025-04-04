@@ -13,12 +13,13 @@ const int MAX_STRING_LENGTH = 10; // Maximum length for received string
 char toothString[MAX_STRING_LENGTH + 1]; // +1 for null terminator
 int stringIndex = 0; // Index to track position in the string
 #include <SPI.h>
-#include <MFRC522.h>
+//#include <MFRC522.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
 
+
 SoftwareSerial tooth(TX_Pin, RX_Pin); //Bluetooth module setup
-MFRC522 mfrc522(sda, rst); // Create MFRC522 instance
+//MFRC522 mfrc522(sda, rst); // Create MFRC522 instance
 Servo myServo; //creates servo instance
 int angle; // creates servo angle integer
 
@@ -27,11 +28,10 @@ byte authorizedUID[4] = {0x68, 0x81, 0x5F, 0x35};
 
 void setup() {
   // Initialize serial comms
-  Serial.begin(115200); //seperates actual serial from bluetooth serial
-  tooth.begin(9600); // Initialize Bluetooth serial
+  Serial.begin(9600); //seperates actual serial from bluetooth serial
+  tooth.begin(115200); // Initialize Bluetooth serial
   
   // Clear the string buffer
-  clearToothString();
 
   //set servo pin
   myServo.attach(8);
@@ -46,7 +46,7 @@ void setup() {
   SPI.begin();
   
   // Initialize card reader
-  mfrc522.PCD_Init();
+  //mfrc522.PCD_Init();
   
   Serial.println(F("RFID reader up. Waiting for card..."));
   
@@ -70,20 +70,15 @@ void loop() {
       tooth.print("Received: ");
       tooth.println(toothString);
       
-      // Check if the string is "yes"
-      if (strcmp(toothString, "yes") == 0) {
+      // Check if the string is "y" instead of "yes"
+      if (strcmp(toothString, "y") == 0) {
         // Turn on all LEDs
         digitalWrite(LEDred, HIGH);
         digitalWrite(LEDgreen, HIGH);
         digitalWrite(LEDyellow, HIGH);
         
-        // Turn on buzzer for 300ms
-        digitalWrite(buzzpin, HIGH);
-        delay(300);
-        digitalWrite(buzzpin, LOW);
-        
-        // Keep LEDs on for remainder of 2 seconds
-        delay(1700);
+        // Delay for 500ms
+        delay(500);
         
         // Turn off all LEDs
         digitalWrite(LEDred, LOW);
@@ -101,67 +96,16 @@ void loop() {
     }
   }
   
-
+  // RFID section is commented out
   // Look for new cards
-  if (!mfrc522.PICC_IsNewCardPresent()) {
-    return;
-  }
+  //if (!mfrc522.PICC_IsNewCardPresent()) {
+  //  return;
+  //}
 
   // Select one of the cards
-  if (!mfrc522.PICC_ReadCardSerial()) {
-    return;
-  }
-
-  // Show UID on serial (Deprecated as of now to clear up serial)
-  //Serial.print(F("RFID Tag UID:"));
-  //printHex(mfrc522.uid.uidByte, mfrc522.uid.size);
-  //Serial.println("");
-  
-  // Check if the scanned card matches the authorizedUID
-  if (compareUID(mfrc522.uid.uidByte, authorizedUID, mfrc522.uid.size)) {
-    //deprecated as of now to clear serial //Serial.println(F("Right card detected!")); 
-    
-    // Turn on all LEDs
-    digitalWrite(LEDred, HIGH);
-    digitalWrite(LEDgreen, HIGH); //All LED on
-    digitalWrite(LEDyellow, HIGH);
-    digitalWrite(buzzpin,LOW); //redundency
-    // Wait for 500
-    delay(500);
-    
-    // Turn off all LEDs
-    digitalWrite(LEDred, LOW);
-    digitalWrite(LEDgreen, LOW);
-    digitalWrite(LEDyellow, LOW);
-  } else {
-    // deprecated to clear serial: //Serial.println(F("Unknown card")); //if it doesnt match authUID
-    digitalWrite(buzzpin, HIGH); //buzzer goes off
-    delay(300);
-    digitalWrite(buzzpin, LOW);
-  }
-
-  mfrc522.PICC_HaltA(); // Halt PICC..
-  mfrc522.PCD_StopCrypto1(); // Stop encryption..
-  
-  // Small delay before next read
-  delay(200);
-}
-
-void printHex(byte *buffer, byte bufferSize) { //calculations for UID 
-  for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
-  }
-}
-
-// Function to compare UIDs from Bradford's code
-bool compareUID(byte *buffer1, byte *buffer2, byte bufferSize) {
-  for (byte i = 0; i < bufferSize; i++) {
-    if (buffer1[i] != buffer2[i]) {
-      return false;
-    }
-  }
-  return true;
+  //if (!mfrc522.PICC_ReadCardSerial()) {
+  //  return;
+  //}
 }
 
 // Function to clear the received string
