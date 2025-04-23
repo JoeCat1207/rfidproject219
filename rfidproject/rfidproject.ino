@@ -106,9 +106,11 @@ void loop() {
     }
   }
 
-  // Ultrasonic sensor check: beep if object moved farther than 5cm from baseline
+  // Ultrasonic sensor check: buzz if object moves more than 10cm from initial distance
   long currentDistance = measureDistance();
-  if (currentDistance > initialDistance + 5) {
+  long delta = currentDistance - initialDistance;
+  // if moved farther or closer by more than 10cm
+  if (delta > 10 || delta < -10) {
     digitalWrite(buzzpin, HIGH);
     delay(200);
     digitalWrite(buzzpin, LOW);
